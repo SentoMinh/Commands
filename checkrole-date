@@ -1,0 +1,20 @@
+const { SlashCommandBuilder } = require('discord.js');
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName('subscription')
+        .setDescription('Show users with roles assigned by the bot'),
+
+    async execute(interaction) {
+        const assignments = await RoleAssignment.find({});
+        if (!assignments.length) {
+            return interaction.reply({ content: 'No role assignments found.', ephemeral: true });
+        }
+//format @user - role'sname - date gave - date expired
+        const result = assignments.map(
+            assignment => `@${assignment.username} - ${assignment.roleName} - <t:${Math.floor(assignment.dayGiven.getTime() / 1000)}:F> - <t:${Math.floor(assignment.dayExpired.getTime() / 1000)}:F>`
+        ).join('\n');
+
+        await interaction.reply({ content: result, ephemeral: true });
+    }
+};
